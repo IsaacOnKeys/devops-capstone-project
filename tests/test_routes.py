@@ -25,6 +25,8 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -124,7 +126,9 @@ class TestAccountService(TestCase):
             json=account.serialize(),
             content_type="test/html"
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
     def test_get_account(self):
@@ -160,7 +164,9 @@ class TestAccountService(TestCase):
         # update the account
         new_account = resp.get_json()
         new_account["name"] = "Something Known"
-        resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
+        resp = self.client.put(
+            f"{BASE_URL}/{new_account['id']}",
+            json=new_account)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_account = resp.get_json()
         self.assertEqual(updated_account["name"], "Something Known")
@@ -169,10 +175,16 @@ class TestAccountService(TestCase):
         """It should return 404 when trying to update a nonexistent Account"""
         nonexistent_id = 9999
         update_data = {"name": "Nonexistent Account"}
-        resp = self.client.put(f"{BASE_URL}/{nonexistent_id}", json=update_data)
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        resp = self.client.put(
+            f"{BASE_URL}/{nonexistent_id}",
+            json=update_data)
+        self.assertEqual(
+            resp.status_code,
+            status.HTTP_404_NOT_FOUND)
         error_message = resp.get_json()
-        self.assertIn(f"Account with id [{nonexistent_id}] could not be found.", error_message["message"])
+        self.assertIn(
+            f"Account with id [{nonexistent_id}] could not be found.",
+            error_message["message"])
 
     def test_delete_account(self):
         """It should Delete an Account"""
@@ -187,15 +199,20 @@ class TestAccountService(TestCase):
         headers = {
             'X-Frame-Options': 'SAMEORIGIN',
             'X-Content-Type-Options': 'nosniff',
-            'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
+            'Content-Security-Policy': 'default-src \'self\'; \
+                object-src \'none\'',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         }
         for key, value in headers.items():
             self.assertEqual(response.headers.get(key), value)
-            
+
     def test_cors_security(self):
         """It should return a CORS header"""
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK)
         # Check for the CORS header
-        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
+        self.assertEqual(
+            response.headers.get('Access-Control-Allow-Origin'),
+            '*')
